@@ -1,49 +1,52 @@
-$lightGreen: #b9e7e7;
+$themes: (
+  light: (
+    textColor: #000,
+    bg: white,
+    logo: darkblue,
+    bgSoft: #f6f3f3,
+    textColorSoft: #555,
+    border: lightgray,
+  ),
+  dark: (
+    textColor: whitesmoke,
+    bg: #222,
+    logo: white,
+    bgSoft: #333,
+    textColorSoft: lightgray,
+    border: #444,
+  ),
+);
 
-.app {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-
-  section {
-    padding: 40px 0 0 0;
-    overflow: hidden;
-    max-width: 100%;
-
-    .card {
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      padding: 10px;
-    }
-    .sidebar-sticky {
-      position: -webkit-sticky;
-      position: sticky;
-      top: 0;
-    }
-    .ql-editor {
-      min-height: 200px;
-    }
-    //LOGIN & REGISTER
-
-    //NAVBAR
-
-    //FOOTER
-
-    footer {
-      margin-top: 100px;
-      padding: 20px;
-      background-color: $lightGreen;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      img {
-        height: 50px;
+@mixin themify($themes) {
+  @each $theme, $map in $themes {
+    .theme-#{$theme} & {
+      $theme-map: () !global;
+      @each $key, $submap in $map {
+        $value: map-get(map-get($themes, $theme), "#{$key}");
+        $theme-map: map-merge(
+          $theme-map,
+          (
+            $key: $value,
+          )
+        ) !global;
       }
-      a {
-        text-decoration: none;
-      }
+      @content;
+      $theme-map: null !global;
     }
+  }
+}
 
-    //HOME
+@function themed($key) {
+  @return map-get($theme-map, $key);
+}
+
+@mixin mobile {
+  @media (max-width: 480px) {
+    @content;
+  }
+}
+@mixin tablet {
+  @media (max-width: 960px) {
+    @content;
   }
 }
