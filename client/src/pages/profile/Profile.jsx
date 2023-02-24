@@ -30,7 +30,7 @@ const Profile = () => {
   );
 
   const { isLoading: rIsLoading, data: relationshipData } = useQuery(
-    ["relationship"],
+    ["relationship", userId],
     () =>
       makeRequest.get("/relationships?followedUserId=" + userId).then((res) => {
         return res.data;
