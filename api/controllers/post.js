@@ -26,23 +26,26 @@ export const getPosts = (req, res) => {
         WHERE 
           p.userId = ? 
         ORDER BY p.createdAt DESC`
-        : 
-            	
+        :          	
         `
         SELECT 
           p.*, name, profilePic 
         FROM 
-          posts AS p JOIN users AS u ON (u.id = p.userId) 
+          posts AS p 
+        JOIN 
+          users AS u 
+        ON 
+          p.userId = u.id
         WHERE
-          p.userId = ?
-        OR EXISTS (
+          u.id = ?
+        OR EXISTS 
+        (
             SELECT
                 r.followedUserId
             FROM
-                relationships AS r 
-        
+                relationships AS r  
             WHERE
-              p.userId = r.followedUserId and r.followerUserId =?
+              u.id = r.followedUserId and r.followerUserId =?
         )  
         ORDER BY p.createdAt DESC`;
 
@@ -66,7 +69,7 @@ export const getPosts = (req, res) => {
         //   FROM 
         //     relationships AS r
         //   JOIN 
-        //     users AS u 
+        //     users AS u fvv
         //   ON 
         //     r.followedUserId = u.id
         //   JOIN 
