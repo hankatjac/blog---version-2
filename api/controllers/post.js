@@ -14,13 +14,71 @@ export const getPosts = (req, res) => {
 
     const q =
       userId !== "undefined"
-        ? `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId) WHERE p.userId = ? ORDER BY p.createdAt DESC`
-        : `SELECT p.*, u.id AS userId, name, profilePic FROM posts AS p JOIN users AS u ON (u.id = p.userId)
-    LEFT JOIN relationships AS r ON (p.userId = r.followedUserId) WHERE r.followerUserId= ? OR p.userId =?
-    ORDER BY p.createdAt DESC`;
+        ? `
+        SELECT 
+          p.*, name, profilePic 
+        FROM 
+          posts AS p 
+        JOIN 
+          users AS u 
+        ON 
+        (u.id = p.userId) 
+        WHERE 
+          p.userId = ? 
+        ORDER BY p.createdAt DESC`
+        : 
+            	
+        `
+        SELECT 
+          p.*, name, profilePic 
+        FROM 
+          posts AS p JOIN users AS u ON (u.id = p.userId) 
+        WHERE
+          p.userId = ?
+        OR EXISTS (
+            SELECT
+                r.followedUserId
+            FROM
+                relationships AS r 
+        
+            WHERE
+              p.userId = r.followedUserId and r.followerUserId =?
+        )  
+        ORDER BY p.createdAt DESC`;
 
-    const values =
-      userId !== "undefined" ? [userId] : [userInfo.id, userInfo.id];
+        // `(
+        //   SELECT 
+        //     p.*, u.name, u.profilePic 
+        //   FROM 
+        //     posts AS p 
+        //   JOIN 
+        //     users AS u 
+        //   ON 
+        //     p.userId = u.id
+        //   WHERE 
+        //     u.id = ? )
+            
+        //   UNION
+  
+        //   (
+        //   SELECT 
+        //     p.*, u.name, u.profilePic 
+        //   FROM 
+        //     relationships AS r
+        //   JOIN 
+        //     users AS u 
+        //   ON 
+        //     r.followedUserId = u.id
+        //   JOIN 
+        //     posts AS p 
+        //   ON 
+        //     p.userId = u.id
+        //   WHERE 
+        //     r.followerUserId = ?)
+  
+        // ORDER BY createdAt DESC`;
+
+    const values = userId !== "undefined" ? [userId] : [userInfo.id, userInfo.id];
 
     db.query(q, values, (err, data) => {
       if (err) return res.status(500).json(err);
